@@ -27,6 +27,7 @@ namespace mx
         , positionData{}
         , printData{}
         , noteAttachmentData{}
+        , lyricData{}
         {
             
         }

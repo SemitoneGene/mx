@@ -177,6 +177,8 @@ namespace mx
             myOutNoteData.isTieStart = reader.getIsTieStart();
             myOutNoteData.isTieStop = reader.getIsTieStop();
 
+            parseLyrics();
+
             parseMiscData();
             const auto& incomingNoteAttributes = *(myNote.getAttributes());
             myOutNoteData.positionData = impl::getPositionData( incomingNoteAttributes );
@@ -430,6 +432,16 @@ namespace mx
                             break;
                     }
                 }
+            }
+        }
+
+        void NoteFunctions::parseLyrics() const
+        {
+            for( const auto& lyricPtr : myNote.getLyricSet() )
+            {
+                //std::string text;
+                //LyricSyllable syllable;
+                //myOutNoteData.lyricData.push_back( lyricPtr );
             }
         }
 

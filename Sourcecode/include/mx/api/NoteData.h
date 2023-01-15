@@ -7,6 +7,7 @@
 #include "mx/api/PrintData.h"
 #include "mx/api/PositionData.h"
 #include "mx/api/DurationData.h"
+#include "mx/api/LyricData.h"
 #include "mx/api/PitchData.h"
 #include "mx/api/NoteAttachmentData.h"
 
@@ -118,6 +119,8 @@ namespace mx
             
             NoteAttachmentData noteAttachmentData;
 
+            LyricData lyricData;
+            
             // these strings will be stuffed into the editorial <footnote> element
             // preceded by the string ##misc-data##. for example if you have the
             // strings Bob, Cat, Hello then we will get:
@@ -147,6 +150,7 @@ namespace mx
         MXAPI_EQUALS_MEMBER( positionData )
         MXAPI_EQUALS_MEMBER( printData )
         MXAPI_EQUALS_MEMBER( noteAttachmentData )
+        MXAPI_EQUALS_MEMBER( lyricData )
         MXAPI_EQUALS_MEMBER( miscData )
         MXAPI_EQUALS_END;
         MXAPI_NOT_EQUALS_AND_VECTORS( NoteData );

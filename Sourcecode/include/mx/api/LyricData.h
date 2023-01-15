@@ -10,12 +10,23 @@ namespace mx
 {
     namespace api
     {
+        enum class LyricSyllable
+        {
+            unspecified, // a value was not provided
+            single,
+            begin,
+            end,
+            middle
+        };
+    
         class LyricData
         {
         public:
             LyricData() {}
             
             std::string text;
+            LyricSyllable syllable;
+            
         };
         
         MXAPI_EQUALS_BEGIN( LyricData )

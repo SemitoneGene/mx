@@ -60,36 +60,40 @@ int main(int argc, const char * argv[])
     std::istringstream istr{ xml };
 
     // ask the document manager to parse the xml into memory for us, returns a document ID.
-    const auto documentID = mgr.createFromStream( istr );
+    //const auto documentID = mgr.createFromStream( istr );
+    
+    const auto filePath = std::string("/Users/gragan/Desktop/ottava.xml");
+    const auto documentID = mgr.createFromFile( filePath );
 
+    
     // get the structural representation of the score from the document manager
     const auto score = mgr.getData( documentID );
 
     // we need to explicitly destroy the document from memory
     mgr.destroyDocument(documentID);
 
-    // make sure we have exactly one part
-    if( score.parts.size() != 1 )
-    {
-        return MX_IS_A_FAILURE;
-    }
-
-    // drill down into the data structure to retrieve the note
-    const auto& part = score.parts.at( 0 );
-    const auto& measure = part.measures.at( 0 );
-    const auto& staff = measure.staves.at( 0 );
-    const auto& voice = staff.voices.at( 0 );
-    const auto& note = voice.notes.at( 0 );
-
-    if( note.durationData.durationName != DurationName::whole )
-    {
-        return MX_IS_A_FAILURE;
-    }
-
-    if( note.pitchData.step != Step::c )
-    {
-        return MX_IS_A_FAILURE;
-    }
+//    // make sure we have exactly one part
+//    if( score.parts.size() != 1 )
+//    {
+//        return MX_IS_A_FAILURE;
+//    }
+//
+//    // drill down into the data structure to retrieve the note
+//    const auto& part = score.parts.at( 0 );
+//    const auto& measure = part.measures.at( 0 );
+//    const auto& staff = measure.staves.at( 0 );
+//    const auto& voice = staff.voices.at( 0 );
+//    const auto& note = voice.notes.at( 0 );
+//
+//    if( note.durationData.durationName != DurationName::whole )
+//    {
+//        return MX_IS_A_FAILURE;
+//    }
+//
+//    if( note.pitchData.step != Step::c )
+//    {
+//        return MX_IS_A_FAILURE;
+//    }
 
     return MX_IS_A_SUCCESS;
 }
