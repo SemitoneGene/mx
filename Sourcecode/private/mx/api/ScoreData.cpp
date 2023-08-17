@@ -18,6 +18,8 @@ namespace mx
         , movementNumber{}
         , composer{}
         , lyricist{}
+        , arranger{}
+        , publisher{}
         , copyright{}
         , encoding{}
         , pageTextItems{}

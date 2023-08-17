@@ -99,6 +99,16 @@ namespace mx
                 header->getIdentification()->addCreator( composer );
             }
             
+            if( !myScoreData.arranger.empty() )
+            {
+                auto arranger = core::makeCreator();
+                arranger->getAttributes()->hasType = true;
+                arranger->getAttributes()->type = core::XsToken( "arranger" );
+                arranger->setValue( core::XsString( myScoreData.arranger ) );
+                header->setHasIdentification( true );
+                header->getIdentification()->addCreator( arranger );
+            }
+            
             if( !myScoreData.lyricist.empty() )
             {
                 auto lyricist = core::makeCreator();
@@ -107,6 +117,16 @@ namespace mx
                 lyricist->setValue( core::XsString( myScoreData.lyricist ) );
                 header->setHasIdentification( true );
                 header->getIdentification()->addCreator( lyricist );
+            }
+            
+            if( !myScoreData.publisher.empty() )
+            {
+                auto publisher = core::makeCreator();
+                publisher->getAttributes()->hasType = true;
+                publisher->getAttributes()->type = core::XsToken( "publisher" );
+                publisher->setValue( core::XsString( myScoreData.publisher ) );
+                header->setHasIdentification( true );
+                header->getIdentification()->addCreator( publisher );
             }
             
             if( !myScoreData.copyright.empty() )

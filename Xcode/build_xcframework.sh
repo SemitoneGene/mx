@@ -15,9 +15,12 @@ echo "Building for iOS devices (arm64)"
 xcodebuild archive \
 -scheme MxiOS \
 -sdk iphoneos \
--destination "generic/platform=iOS" \
+-destination "platform=iOS,id=dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder" \
 -archivePath "build/Mx.iOS.xcarchive" \
 SKIP_INSTALL=NO
+
+xcodebuild -scheme MxiOS -destination ''
+
 
 echo "Building for iOS simulator"
 xcodebuild archive \
@@ -37,7 +40,6 @@ xcodebuild -create-xcframework \
 -framework "build/Mx.macOS.xcarchive/Products/Library/Frameworks/MxmacOS.framework" \
 -framework "build/Mx.iOS.xcarchive/Products/Library/Frameworks/MxiOS.framework" \
 -framework "build/Mx.iOS-simulator.xcarchive/Products/Library/Frameworks/MxiOS.framework" \
--framework "build/Mx.catalyst.xcarchive/Products/Library/Frameworks/MxiOS.framework" \
 -output "Mx.xcframework"
 
 #rm -r build

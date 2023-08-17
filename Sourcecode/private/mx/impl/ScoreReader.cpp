@@ -232,13 +232,13 @@ namespace mx
                     
                     if( a->type.getValue() == "arranger" )
                     {
-                        myOutScoreData.lyricist = i->getValue().getValue();
+                        myOutScoreData.arranger = i->getValue().getValue();
                         isArrangerFound = true;
                     }
                     
                     if( a->type.getValue() == "publisher" )
                     {
-                        myOutScoreData.lyricist = i->getValue().getValue();
+                        myOutScoreData.publisher = i->getValue().getValue();
                         isPublisherFound = true;
                     }
                 }
