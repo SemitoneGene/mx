@@ -2,7 +2,6 @@
 
 rm -r Mx.xcframework
 rm -r build
-#xcodebuild clean 
 
 echo "Building for macOS"
 xcodebuild archive \
@@ -16,11 +15,8 @@ xcodebuild archive \
 -scheme MxiOS \
 -sdk iphoneos \
 -destination "platform=iOS,id=dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder" \
--archivePath "build/Mx.iOS.xcarchive" \
-SKIP_INSTALL=NO
-
-xcodebuild -scheme MxiOS -destination ''
-
+-archivePath "build/Mx.iOS.device.xcarchive" \
+SKIP_INSTALL=NO \
 
 echo "Building for iOS simulator"
 xcodebuild archive \
@@ -38,10 +34,8 @@ SKIP_INSTALL=NO
 
 xcodebuild -create-xcframework \
 -framework "build/Mx.macOS.xcarchive/Products/Library/Frameworks/MxmacOS.framework" \
--framework "build/Mx.iOS.xcarchive/Products/Library/Frameworks/MxiOS.framework" \
+-framework "build/Mx.iOS.device.xcarchive/Products/Library/Frameworks/MxiOS.framework" \
 -framework "build/Mx.iOS-simulator.xcarchive/Products/Library/Frameworks/MxiOS.framework" \
 -output "Mx.xcframework"
-
-#rm -r build
 
 open .
