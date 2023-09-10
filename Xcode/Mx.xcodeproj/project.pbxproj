@@ -10439,7 +10439,7 @@
 				GCC_ENABLE_CPP_RTTI = YES;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = "mx-macOS";
-				SDKROOT = macosx;
+				SDKROOT = iphoneos;
 			};
 			name = Debug;
 		};
@@ -10462,7 +10462,7 @@
 				GCC_ENABLE_CPP_RTTI = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "mx-macOS";
-				SDKROOT = macosx;
+				SDKROOT = iphoneos;
 			};
 			name = Release;
 		};
@@ -10544,7 +10544,8 @@
 					"-I/usr/local/opt/llvm/include",
 				);
 				OTHER_LDFLAGS = "";
-				SDKROOT = "";
+				SDKROOT = macosx13.3;
+				SUPPORTED_PLATFORMS = macosx;
 				USER_HEADER_SEARCH_PATHS = "$PROJECT_DIR/../Sourcecode/private $PROJECT_DIR/../Sourcecode/include $PROJECT_DIR/../Sourcecode/private/mx/ezxml/src/include $PROJECT_DIR/../Sourcecode/private/mx/ezxml/src/private";
 				VALID_ARCHS = "$(ARCHS_STANDARD)";
 			};
@@ -10622,7 +10623,8 @@
 					"-I/usr/local/opt/llvm/include",
 				);
 				OTHER_LDFLAGS = "";
-				SDKROOT = "";
+				SDKROOT = macosx13.3;
+				SUPPORTED_PLATFORMS = macosx;
 				USER_HEADER_SEARCH_PATHS = "$PROJECT_DIR/../Sourcecode/private $PROJECT_DIR/../Sourcecode/include $PROJECT_DIR/../Sourcecode/private/mx/ezxml/src/include $PROJECT_DIR/../Sourcecode/private/mx/ezxml/src/private";
 				VALID_ARCHS = "$(ARCHS_STANDARD)";
 			};
@@ -10645,6 +10647,7 @@
 				);
 				MACH_O_TYPE = staticlib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx13.3;
 			};
 			name = Debug;
 		};
@@ -10665,6 +10668,7 @@
 				);
 				MACH_O_TYPE = staticlib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx13.3;
 			};
 			name = Release;
 		};
@@ -10759,8 +10763,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = mjb.MxiOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				"SDKROOT[arch=i386]" = "$(CORRESPONDING_SIMULATOR_SDK_NAME)";
-				"SDKROOT[arch=x86_64]" = "$(CORRESPONDING_SIMULATOR_SDK_NAME)";
 				SKIP_INSTALL = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -10801,8 +10803,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = mjb.MxiOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				"SDKROOT[arch=i386]" = "$(CORRESPONDING_SIMULATOR_SDK_NAME)";
-				"SDKROOT[arch=x86_64]" = "$(CORRESPONDING_SIMULATOR_SDK_NAME)";
 				SKIP_INSTALL = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
