@@ -36,6 +36,7 @@ xcodebuild -create-xcframework \
 -framework "build/Mx.macOS.xcarchive/Products/Library/Frameworks/MxmacOS.framework" \
 -framework "build/Mx.iOS.device.xcarchive/Products/Library/Frameworks/MxiOS.framework" \
 -framework "build/Mx.iOS-simulator.xcarchive/Products/Library/Frameworks/MxiOS.framework" \
+-framework "build/Mx.catalyst.xcarchive/Products/Library/Frameworks/MxiOS.framework" \
 -output "Mx.xcframework"
 
 open .
