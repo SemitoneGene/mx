@@ -550,13 +550,6 @@ namespace mx
                 return;
             }
 
-            auto pedalType = api::MarkType::pedal;
-
-            if( attr.type == core::StartStopChangeContinue::stop )
-            {
-                pedalType = api::MarkType::damp;
-            }
-
             const auto placement =
                 myDirection->getAttributes()->hasPlacement ?
                     ( myDirection->getAttributes()->placement == core::AboveBelow::above ?
@@ -564,10 +557,45 @@ namespace mx
                       api::Placement::below )
                 : api::Placement::unspecified;
 
+            myOutDirectionData.placement = placement;
+
+            if( attr.hasLine && attr.line == core::YesNo::yes )
+            {
+                if( attr.type == core::StartStopChangeContinue::start )
+                {
+                    api::SpannerStart start;
+                    start.tickTimePosition = myOutDirectionData.tickTimePosition;
+                    start.positionData = getPositionData( attr );
+                    start.positionData.placement = placement;
+                    start.lineData.lineType = api::LineType::solid;
+                    start.lineData.lineHook = api::LineHook::none;
+                    myOutDirectionData.pedalStarts.emplace_back( std::move( start ) );
+                }
+                else if( attr.type == core::StartStopChangeContinue::stop )
+                {
+                    api::SpannerStop stop;
+                    stop.tickTimePosition = myOutDirectionData.tickTimePosition;
+                    stop.positionData = getPositionData( attr );
+                    stop.positionData.placement = placement;
+                    stop.lineData.lineType = api::LineType::solid;
+                    stop.lineData.lineHook = api::LineHook::down;
+                    stop.lineData.isStopLengthSpecified = true;
+                    stop.lineData.endLength = 10.0;
+                    myOutDirectionData.pedalStops.emplace_back( std::move( stop ) );
+                }
+                return;
+            }
+
+            auto pedalType = api::MarkType::pedal;
+
+            if( attr.type == core::StartStopChangeContinue::stop )
+            {
+                pedalType = api::MarkType::damp;
+            }
+
             auto mark = api::MarkData{ placement, pedalType };
             mark.positionData = getPositionData( attr );
             mark.positionData.placement = placement;
-            myOutDirectionData.placement = placement;
             myOutDirectionData.marks.emplace_back( std::move( mark ) );
         }
 

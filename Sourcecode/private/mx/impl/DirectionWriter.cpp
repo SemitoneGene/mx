@@ -159,6 +159,36 @@ namespace mx
                 }
             }
             
+            for( const auto& pedalStart : myDirectionData.pedalStarts )
+            {
+                auto directionTypePtr = core::makeDirectionType();
+                this->addDirectionType( directionTypePtr, directionPtr );
+                directionTypePtr->setChoice( core::DirectionType::Choice::pedal );
+                auto pedalPtr = directionTypePtr->getPedal();
+                auto attr = pedalPtr->getAttributes();
+                attr->type = core::StartStopChangeContinue::start;
+                attr->hasLine = true;
+                attr->line = core::YesNo::yes;
+                attr->hasSign = true;
+                attr->sign = core::YesNo::yes;
+                setAttributesFromPositionData( pedalStart.positionData, *attr );
+            }
+
+            for( const auto& pedalStop : myDirectionData.pedalStops )
+            {
+                auto directionTypePtr = core::makeDirectionType();
+                this->addDirectionType( directionTypePtr, directionPtr );
+                directionTypePtr->setChoice( core::DirectionType::Choice::pedal );
+                auto pedalPtr = directionTypePtr->getPedal();
+                auto attr = pedalPtr->getAttributes();
+                attr->type = core::StartStopChangeContinue::stop;
+                attr->hasLine = true;
+                attr->line = core::YesNo::yes;
+                attr->hasSign = true;
+                attr->sign = core::YesNo::yes;
+                setAttributesFromPositionData( pedalStop.positionData, *attr );
+            }
+
             for( const auto& wedgeStop : myDirectionData.wedgeStops )
             {
                 auto wedgeStartDirectionTypePtr = core::makeDirectionType();
