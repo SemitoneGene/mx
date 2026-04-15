@@ -63,6 +63,8 @@ namespace mx
             std::vector<SpannerStop> ottavaStops;
             std::vector<SpannerStart> bracketStarts;
             std::vector<SpannerStop> bracketStops;
+            std::vector<SpannerStart> dashesStarts;
+            std::vector<SpannerStop> dashesStops;
             std::vector<WordsData> words;
             std::vector<ChordData> chords;
             std::vector<SegnoData> segnos;
@@ -81,6 +83,8 @@ namespace mx
             , ottavaStops{}
             , bracketStarts{}
             , bracketStops{}
+            , dashesStarts{}
+            , dashesStops{}
             , words{}
             , chords{}
             , segnos{}
@@ -97,6 +101,8 @@ namespace mx
             directionData.wedgeStops.size() == 0 &&
             directionData.bracketStarts.size() == 0 &&
             directionData.bracketStops.size() == 0 &&
+            directionData.dashesStarts.size() == 0 &&
+            directionData.dashesStops.size() == 0 &&
             directionData.tempos.size() == 0 &&
             directionData.ottavaStarts.size() == 0 &&
             directionData.ottavaStops.size() == 0 &&
@@ -118,6 +124,8 @@ namespace mx
         MXAPI_EQUALS_MEMBER( ottavaStops )
         MXAPI_EQUALS_MEMBER( bracketStarts )
         MXAPI_EQUALS_MEMBER( bracketStops )
+        MXAPI_EQUALS_MEMBER( dashesStarts )
+        MXAPI_EQUALS_MEMBER( dashesStops )
         MXAPI_EQUALS_MEMBER( words )
         MXAPI_EQUALS_MEMBER( chords )
         MXAPI_EQUALS_MEMBER( segnos )

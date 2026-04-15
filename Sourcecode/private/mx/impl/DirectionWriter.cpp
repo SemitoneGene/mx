@@ -14,6 +14,7 @@
 #include "mx/core/elements/BeatUnitPer.h"
 #include "mx/core/elements/BeatUnitPerOrNoteRelationNoteChoice.h"
 #include "mx/core/elements/Bracket.h"
+#include "mx/core/elements/BracketAttributes.h"
 #include "mx/core/elements/Coda.h"
 #include "mx/core/elements/Damp.h"
 #include "mx/core/elements/DampAll.h"
@@ -254,6 +255,33 @@ namespace mx
                 }
             }
             
+            const auto setBracketLineData = [&]( const api::LineData& lineData, core::BracketAttributes& attr ) {
+                attr.lineEnd = lineData.lineHook == api::LineHook::unspecified
+                    ? core::LineEnd::none
+                    : myConverter.convert( lineData.lineHook );
+
+                if( lineData.lineType != api::LineType::unspecified )
+                {
+                    attr.hasLineType = true;
+                    attr.lineType = myConverter.convert( lineData.lineType );
+                }
+                if( lineData.isStopLengthSpecified )
+                {
+                    attr.hasEndLength = true;
+                    attr.endLength = core::TenthsValue{ static_cast<core::DecimalType>( lineData.endLength ) };
+                }
+                if( lineData.isDashLengthSpecified )
+                {
+                    attr.hasDashLength = true;
+                    attr.dashLength = core::TenthsValue{ static_cast<core::DecimalType>( lineData.dashLength ) };
+                }
+                if( lineData.isSpaceLengthSpecified )
+                {
+                    attr.hasSpaceLength = true;
+                    attr.spaceLength = core::TenthsValue{ static_cast<core::DecimalType>( lineData.spaceLength ) };
+                }
+            };
+
             for( const auto& item : myDirectionData.bracketStarts )
             {
                 auto outDirType = core::makeDirectionType();
@@ -262,6 +290,47 @@ namespace mx
                 auto outElement = outDirType->getBracket();
                 auto& attr = *outElement->getAttributes();
                 setAttributesFromSpannerStart( item, attr );
+                attr.type = core::StartStopContinue::start;
+                setAttributesFromPositionData( item.positionData, attr );
+                setAttributesFromPrintData( item.printData, attr );
+                setBracketLineData( item.lineData, attr );
+            }
+
+            for( const auto& item : myDirectionData.bracketStops )
+            {
+                auto outDirType = core::makeDirectionType();
+                this->addDirectionType( outDirType, directionPtr );
+                outDirType->setChoice( core::DirectionType::Choice::bracket );
+                auto outElement = outDirType->getBracket();
+                auto& attr = *outElement->getAttributes();
+                setAttributesFromSpannerStop( item, attr );
+                attr.type = core::StartStopContinue::stop;
+                setBracketLineData( item.lineData, attr );
+            }
+
+            for( const auto& item : myDirectionData.dashesStarts )
+            {
+                auto outDirType = core::makeDirectionType();
+                this->addDirectionType( outDirType, directionPtr );
+                outDirType->setChoice( core::DirectionType::Choice::dashes );
+                auto outElement = outDirType->getDashes();
+                auto& attr = *outElement->getAttributes();
+                setAttributesFromSpannerStart( item, attr );
+                attr.type = core::StartStopContinue::start;
+                setAttributesFromPositionData( item.positionData, attr );
+                setAttributesFromPrintData( item.printData, attr );
+                setAttributesFromLineData( item.lineData, attr );
+            }
+
+            for( const auto& item : myDirectionData.dashesStops )
+            {
+                auto outDirType = core::makeDirectionType();
+                this->addDirectionType( outDirType, directionPtr );
+                outDirType->setChoice( core::DirectionType::Choice::dashes );
+                auto outElement = outDirType->getDashes();
+                auto& attr = *outElement->getAttributes();
+                setAttributesFromSpannerStop( item, attr );
+                attr.type = core::StartStopContinue::stop;
             }
 
             for( const auto& tempo : myDirectionData.tempos )

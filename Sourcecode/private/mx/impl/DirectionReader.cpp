@@ -462,7 +462,27 @@ namespace mx
         
         void DirectionReader::parseDashes( const core::DirectionType& directionType)
         {
-            MX_UNUSED( directionType );
+            const auto& dashes = *directionType.getDashes();
+            const auto& attr = *dashes.getAttributes();
+
+            if( attr.type == core::StartStopContinue::stop )
+            {
+                auto stop = impl::getSpannerStop( attr );
+                stop.tickTimePosition = myCursor.tickTimePosition;
+                myOutDirectionData.dashesStops.emplace_back( std::move( stop ) );
+                return;
+            }
+            else if( attr.type == core::StartStopContinue::start )
+            {
+                auto start = impl::getSpannerStart( attr );
+                start.tickTimePosition = myCursor.tickTimePosition;
+                if( start.lineData.lineType == api::LineType::unspecified )
+                {
+                    start.lineData.lineType = api::LineType::dashed;
+                }
+                myOutDirectionData.dashesStarts.emplace_back( std::move( start ) );
+                return;
+            }
         }
         
         
@@ -470,13 +490,38 @@ namespace mx
         {
             const auto& bracket = *directionType.getBracket();
             const auto& attr = *bracket.getAttributes();
+
+            const auto makeBracketLineData = [&]() {
+                api::LineData lineData{};
+                lineData.lineHook = myConverter.convert( attr.lineEnd );
+
+                if( attr.hasLineType )
+                {
+                    lineData.lineType = myConverter.convert( attr.lineType );
+                }
+                if( attr.hasEndLength )
+                {
+                    lineData.isStopLengthSpecified = true;
+                    lineData.endLength = attr.endLength.getValue();
+                }
+                if( attr.hasDashLength )
+                {
+                    lineData.isDashLengthSpecified = true;
+                    lineData.dashLength = attr.dashLength.getValue();
+                }
+                if( attr.hasSpaceLength )
+                {
+                    lineData.isSpaceLengthSpecified = true;
+                    lineData.spaceLength = attr.spaceLength.getValue();
+                }
+                return lineData;
+            };
             
             if( attr.type == core::StartStopContinue::stop )
             {
-                api::SpannerStop stop;
+                auto stop = impl::getSpannerStop( attr );
                 stop.tickTimePosition = myCursor.tickTimePosition;
-                stop.numberLevel = impl::checkNumber( &attr );
-                stop.positionData = this->parsePositionData( attr );
+                stop.lineData = makeBracketLineData();
                 myOutDirectionData.bracketStops.emplace_back( std::move( stop ) );
                 return;
             }
@@ -486,7 +531,7 @@ namespace mx
                 start.tickTimePosition = myCursor.tickTimePosition;
                 start.numberLevel = impl::checkNumber( &attr );
                 start.positionData = this->parsePositionData( attr );
-                start.lineData = impl::getLineData( attr );
+                start.lineData = makeBracketLineData();
                 start.printData = impl::getPrintData( attr );
                 myOutDirectionData.bracketStarts.emplace_back( std::move( start ) );
                 return;
