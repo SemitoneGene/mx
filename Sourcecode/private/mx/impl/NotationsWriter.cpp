@@ -85,6 +85,33 @@ namespace mx
 {
     namespace impl
     {
+        namespace
+        {
+            template<typename ATTRIBUTES_TYPE>
+            void setMordentSpecificAttributes( const api::MarkData& mark, ATTRIBUTES_TYPE& attributes )
+            {
+                Converter converter;
+
+                if( mark.hasMordentLong )
+                {
+                    attributes.hasLong = true;
+                    attributes.long_ = converter.convert( mark.mordentLong );
+                }
+
+                if( mark.hasMordentApproach && mark.mordentApproach != api::Placement::unspecified )
+                {
+                    attributes.hasApproach = true;
+                    attributes.approach = converter.convert( mark.mordentApproach );
+                }
+
+                if( mark.hasMordentDeparture && mark.mordentDeparture != api::Placement::unspecified )
+                {
+                    attributes.hasDeparture = true;
+                    attributes.departure = converter.convert( mark.mordentDeparture );
+                }
+            }
+        }
+
         NotationsWriter::NotationsWriter( const api::NoteData& inNoteData, const MeasureCursor& inCursor, const ScoreWriter& inScoreWriter )
         : myNoteData{ inNoteData }
         , myCursor{ inCursor }
@@ -617,12 +644,14 @@ namespace mx
                 auto element = ornamentsChoice->getMordent();
                 auto attributes = element->getAttributes();
                 setAttributesFromPositionData( mark.positionData, *attributes);
+                setMordentSpecificAttributes( mark, *attributes );
             }
             else if( mark.markType == api::MarkType::invertedMordent )
             {
                 auto element = ornamentsChoice->getInvertedMordent();
                 auto attributes = element->getAttributes();
                 setAttributesFromPositionData( mark.positionData, *attributes);
+                setMordentSpecificAttributes( mark, *attributes );
             }
             else if( mark.markType == api::MarkType::schleifer )
             {

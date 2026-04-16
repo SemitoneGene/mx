@@ -215,6 +215,12 @@ namespace mx
         , tickTimePosition{ 0 }
         , printData{}
         , positionData{}
+        , mordentLong{ Bool::no }
+        , hasMordentLong{ false }
+        , mordentApproach{ Placement::unspecified }
+        , hasMordentApproach{ false }
+        , mordentDeparture{ Placement::unspecified }
+        , hasMordentDeparture{ false }
         {
             
         }
@@ -226,6 +232,12 @@ namespace mx
         , tickTimePosition{ 0 }
         , printData{}
         , positionData{}
+        , mordentLong{ Bool::no }
+        , hasMordentLong{ false }
+        , mordentApproach{ Placement::unspecified }
+        , hasMordentApproach{ false }
+        , mordentDeparture{ Placement::unspecified }
+        , hasMordentDeparture{ false }
         {
             impl::Converter converter;
             if( isMarkDynamic( markType ) )
@@ -249,6 +261,12 @@ namespace mx
         , tickTimePosition{ 0 }
         , printData{}
         , positionData{}
+        , mordentLong{ Bool::no }
+        , hasMordentLong{ false }
+        , mordentApproach{ Placement::unspecified }
+        , hasMordentApproach{ false }
+        , mordentDeparture{ Placement::unspecified }
+        , hasMordentDeparture{ false }
         {
             positionData.placement = inPlacement;
             impl::Converter converter;
