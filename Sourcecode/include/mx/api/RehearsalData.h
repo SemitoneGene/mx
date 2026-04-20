@@ -12,6 +12,18 @@ namespace mx
 {
     namespace api
     {
+        enum class RehearsalEnclosure
+        {
+            rectangle,
+            square,
+            oval,
+            circle,
+            bracket,
+            triangle,
+            diamond,
+            none
+        };
+
         class RehearsalData
         {
         public:
@@ -20,9 +32,7 @@ namespace mx
             bool isColorSpecified;
             ColorData colorData;
             FontData fontData;
-            
-            // Additional data about enclosing shape is available
-            // but not supported at this time.
+            RehearsalEnclosure enclosure;
             
             RehearsalData()
             : text{}
@@ -30,6 +40,7 @@ namespace mx
             , isColorSpecified{ false }
             , colorData{}
             , fontData{}
+            , enclosure{ RehearsalEnclosure::rectangle }
             {
             }
         };
@@ -40,6 +51,7 @@ namespace mx
         MXAPI_EQUALS_MEMBER( isColorSpecified )
         MXAPI_EQUALS_MEMBER( colorData )
         MXAPI_EQUALS_MEMBER( fontData )
+        MXAPI_EQUALS_MEMBER( enclosure )
         MXAPI_EQUALS_END;
         MXAPI_NOT_EQUALS_AND_VECTORS( RehearsalData );
     }

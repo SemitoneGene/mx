@@ -327,6 +327,36 @@ namespace mx
                 outRehearsal.text = rehearsalPtr->getValue().getValue();
                 outRehearsal.positionData = getPositionData( attr );
                 outRehearsal.colorData = getColor( attr );
+                if( attr.hasEnclosure )
+                {
+                    switch( attr.enclosure )
+                    {
+                        case core::EnclosureShape::rectangle:
+                            outRehearsal.enclosure = api::RehearsalEnclosure::rectangle;
+                            break;
+                        case core::EnclosureShape::square:
+                            outRehearsal.enclosure = api::RehearsalEnclosure::square;
+                            break;
+                        case core::EnclosureShape::oval:
+                            outRehearsal.enclosure = api::RehearsalEnclosure::oval;
+                            break;
+                        case core::EnclosureShape::circle:
+                            outRehearsal.enclosure = api::RehearsalEnclosure::circle;
+                            break;
+                        case core::EnclosureShape::bracket:
+                            outRehearsal.enclosure = api::RehearsalEnclosure::bracket;
+                            break;
+                        case core::EnclosureShape::triangle:
+                            outRehearsal.enclosure = api::RehearsalEnclosure::triangle;
+                            break;
+                        case core::EnclosureShape::diamond:
+                            outRehearsal.enclosure = api::RehearsalEnclosure::diamond;
+                            break;
+                        case core::EnclosureShape::none:
+                            outRehearsal.enclosure = api::RehearsalEnclosure::none;
+                            break;
+                    }
+                }
                 myOutDirectionData.rehearsals.emplace_back( std::move( outRehearsal ) );
             }
 
