@@ -14,6 +14,9 @@
 #include "mx/core/elements/DisplayStepOctaveGroup.h"
 #include "mx/core/elements/Duration.h"
 #include "mx/core/elements/EditorialVoiceGroup.h"
+#include "mx/core/elements/Elision.h"
+#include "mx/core/elements/ElisionSyllabicGroup.h"
+#include "mx/core/elements/ElisionSyllabicTextGroup.h"
 #include "mx/core/elements/FullNoteGroup.h"
 #include "mx/core/elements/FullNoteTypeChoice.h"
 #include "mx/core/elements/GraceNoteGroup.h"
@@ -128,6 +131,57 @@ namespace mx
                 }
 
                 return outPrintData;
+            }
+
+            std::string getElisionDisplayText( const core::ElisionSyllabicTextGroup& inGroup )
+            {
+                if( inGroup.getHasElisionSyllabicGroup() )
+                {
+                    const auto& elisionGroup = inGroup.getElisionSyllabicGroup();
+                    if( elisionGroup )
+                    {
+                        const auto& elision = elisionGroup->getElision();
+                        if( elision )
+                        {
+                            const auto value = elision->getValue().getValue();
+                            if( ! value.empty() )
+                            {
+                                return value;
+                            }
+                        }
+                    }
+                }
+
+                return "\xE2\x80\xBF";
+            }
+
+            std::string getLyricDisplayText( const core::SyllabicTextGroup& inGroup )
+            {
+                std::string result;
+
+                const auto& leadingText = inGroup.getText();
+                if( leadingText )
+                {
+                    result += leadingText->getValue().getValue();
+                }
+
+                for( const auto& group : inGroup.getElisionSyllabicTextGroupSet() )
+                {
+                    if( ! group )
+                    {
+                        continue;
+                    }
+
+                    result += getElisionDisplayText( *group );
+
+                    const auto& text = group->getText();
+                    if( text )
+                    {
+                        result += text->getValue().getValue();
+                    }
+                }
+
+                return result;
             }
         }
 
@@ -532,7 +586,7 @@ namespace mx
                                 const auto& textPtr = textGroup->getText();
                                 if ( textPtr )
                                 {
-                                    lyricData.text = textPtr->getValue().getValue();
+                                    lyricData.text = getLyricDisplayText( *textGroup );
                                     lyricData.printData = getLyricPrintData( lyricAttributes, textPtr->getAttributes().get() );
                                 }
 
