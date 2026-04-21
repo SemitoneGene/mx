@@ -131,6 +131,8 @@ namespace mx
             ( markType == MarkType::tripleTongue ) ||
             ( markType == MarkType::stopped ) ||
             ( markType == MarkType::snapPizzicato ) ||
+            ( markType == MarkType::fret ) ||
+            ( markType == MarkType::string_ ) ||
             ( markType == MarkType::heel ) ||
             ( markType == MarkType::toe ) ||
             ( markType == MarkType::fingernails ) ||

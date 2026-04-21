@@ -754,6 +754,20 @@ namespace mx
                 auto attributes = element->getAttributes();
                 setAttributesFromPositionData( mark.positionData, *attributes);
             }
+            else if( mark.markType == api::MarkType::fret )
+            {
+                auto element = technicalChoice->getFret();
+                auto value = core::NonNegativeInteger{};
+                value.parse( mark.name );
+                element->setValue( value );
+            }
+            else if( mark.markType == api::MarkType::string_ )
+            {
+                auto element = technicalChoice->getString();
+                auto value = core::StringNumber{};
+                value.parse( mark.name );
+                element->setValue( value );
+            }
             else if( mark.markType == api::MarkType::heel )
             {
                 auto element = technicalChoice->getHeel();

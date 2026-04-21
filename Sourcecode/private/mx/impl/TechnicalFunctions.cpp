@@ -136,8 +136,20 @@ namespace mx
                     outMarkData.name = "snap-pizzicato";
                     return true;
                 }
-                case core::TechnicalChoice::Choice::fret: return false;
-                case core::TechnicalChoice::Choice::string_: return false;
+                case core::TechnicalChoice::Choice::fret:
+                {
+                    const auto& fret = *techicalChoice.getFret();
+                    parseMarkDataAttributes( *fret.getAttributes(), outMarkData );
+                    outMarkData.name = core::toString( fret.getValue() );
+                    return true;
+                }
+                case core::TechnicalChoice::Choice::string_:
+                {
+                    const auto& stringNumber = *techicalChoice.getString();
+                    parseMarkDataAttributes( *stringNumber.getAttributes(), outMarkData );
+                    outMarkData.name = core::toString( stringNumber.getValue() );
+                    return true;
+                }
                 case core::TechnicalChoice::Choice::hammerOn: return false;
                 case core::TechnicalChoice::Choice::pullOff: return false;
                 case core::TechnicalChoice::Choice::bend: return false;
