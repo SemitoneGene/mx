@@ -6,6 +6,7 @@
 #ifdef MX_COMPILE_API_TESTS
 
 #include "cpul/cpulTestHarness.h"
+#include "mxtest/api/TestHelpers.h"
 #include "mxtest/api/RoundTrip.h"
 #include "mx/api/DocumentManager.h"
 #include "mx/core/Document.h"
@@ -125,6 +126,30 @@ TEST( backwardRepeat, MeasureData )
     CHECK( expectedBarlineType == barline.barlineType );
     CHECK( isRepeatExpected == barline.repeat );
     
+}
+T_END;
+
+TEST( staffLinesRoundTrip, MeasureData )
+{
+    ScoreData score;
+    score.parts.emplace_back();
+    auto& part = score.parts.back();
+    part.measures.emplace_back();
+    auto& measure = part.measures.back();
+    measure.staves.emplace_back();
+    auto& staff = measure.staves.back();
+    staff.staffLines = 1;
+    staff.voices[0].notes.emplace_back();
+
+    const auto xml = mxtest::toXml( score );
+    CHECK( xml.find( "<staff-details>" ) != std::string::npos );
+    CHECK( xml.find( "<staff-lines>1</staff-lines>" ) != std::string::npos );
+
+    const auto outScore = mxtest::fromXml( xml );
+    CHECK_EQUAL( 1, outScore.parts.size() );
+    CHECK_EQUAL( 1, outScore.parts.front().measures.size() );
+    CHECK_EQUAL( 1, outScore.parts.front().measures.front().staves.size() );
+    CHECK_EQUAL( 1, outScore.parts.front().measures.front().staves.front().staffLines );
 }
 T_END;
 

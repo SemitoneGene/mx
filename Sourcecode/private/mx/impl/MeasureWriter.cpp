@@ -229,6 +229,16 @@ namespace mx
             
             for( const auto& staff : myMeasureData.staves )
             {
+                if( staff.staffLines >= 0 )
+                {
+                    int desiredStaffIndex = -1;
+                    if( myHistory.getCursor().getNumStaves() > 1 )
+                    {
+                        desiredStaffIndex = localStaffCounter;
+                    }
+                    myPropertiesWriter->writeStaffDetails( desiredStaffIndex, staff.staffLines );
+                }
+
                 auto clefIter = staff.clefs.cbegin();
                 auto clefEnd = staff.clefs.cend();
                 while( clefIter != clefEnd && clefIter->tickTimePosition == 0 )

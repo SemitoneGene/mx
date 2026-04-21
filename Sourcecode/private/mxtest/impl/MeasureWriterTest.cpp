@@ -15,6 +15,8 @@
 #include "mx/core/elements/Divisions.h"
 #include "mx/core/elements/Clef.h"
 #include "mx/core/elements/Line.h"
+#include "mx/core/elements/StaffDetails.h"
+#include "mx/core/elements/StaffLines.h"
 #include "cpul/cpulTestHarness.h"
 
 #include <memory>
@@ -192,6 +194,35 @@ TEST( PropertiesButNoNotes, MeasureWriter )
     CHECK( 1 == props->getClefSet().back()->getAttributes()->number.getValue() );
     
     CHECK( ++mdcIter == mdcEnd );
+}
+T_END
+
+
+TEST( staffDetailsWritesStaffLines, MeasureWriter )
+{
+    mxtest::TestParameters params;
+    params.ticksPerQuarter = 101;
+    params.measureIndex = 0;
+    params.partIndex = 0;
+    params.numStaves = 1;
+    mxtest::TestItems t = mxtest::setupTestItems( params );
+    auto& staff = t.measureData->staves.at( 0 );
+    staff.staffLines = 1;
+
+    const auto partwiseMeasure = t.measureWriter->getPartwiseMeasure();
+    auto mdcIter = partwiseMeasure->getMusicDataGroup()->getMusicDataChoiceSet().cbegin();
+    const auto mdcEnd = partwiseMeasure->getMusicDataGroup()->getMusicDataChoiceSet().cend();
+
+    CHECK( mdcIter != mdcEnd );
+    CHECK( (*mdcIter)->getChoice() == core::MusicDataChoice::Choice::properties );
+
+    const auto props = (*mdcIter)->getProperties();
+    CHECK_EQUAL( 1, props->getStaffDetailsSet().size() );
+
+    const auto details = props->getStaffDetailsSet().front();
+    CHECK( details->getHasStaffLines() );
+    CHECK_EQUAL( 1, details->getStaffLines()->getValue().getValue() );
+    CHECK( !details->getAttributes()->hasNumber );
 }
 T_END
 

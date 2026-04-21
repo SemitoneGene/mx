@@ -102,6 +102,7 @@ namespace mx
             void parseLink( const core::Link& inMxLink ) const;
             void parseBookmark( const core::Bookmark& inMxBookmark ) const;
             void coutItemNotSupported( const core::ElementInterface& element ) const;
+            void importStaffDetails( const core::Properties& inMxProperties ) const;
             void importClefs( const core::ClefSet& inClefs ) const;
             void importClef( const core::Clef& inClef ) const;
             void insertNoteData( api::NoteData&& noteData, int staff, int voice ) const;

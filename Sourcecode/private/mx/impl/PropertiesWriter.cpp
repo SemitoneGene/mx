@@ -17,6 +17,7 @@
 #include "mx/core/elements/MeasureStyle.h"
 #include "mx/core/elements/PartSymbol.h"
 #include "mx/core/elements/StaffDetails.h"
+#include "mx/core/elements/StaffLines.h"
 #include "mx/core/elements/Staves.h"
 #include "mx/core/elements/Time.h"
 #include "mx/core/elements/Transpose.h"
@@ -253,6 +254,21 @@ namespace mx
         {
             myProperties->setHasStaves( true );
             myProperties->getStaves()->setValue( core::NonNegativeInteger{ value } );
+        }
+
+
+        void PropertiesWriter::writeStaffDetails( int staffIndex, int staffLines )
+        {
+            auto staffDetails = core::makeStaffDetails();
+            if( staffIndex >= 0 )
+            {
+                staffDetails->getAttributes()->hasNumber = true;
+                staffDetails->getAttributes()->number = core::StaffNumber{ staffIndex + 1 };
+            }
+
+            staffDetails->setHasStaffLines( true );
+            staffDetails->getStaffLines()->setValue( core::NonNegativeInteger{ staffLines } );
+            myProperties->addStaffDetails( staffDetails );
         }
         
         

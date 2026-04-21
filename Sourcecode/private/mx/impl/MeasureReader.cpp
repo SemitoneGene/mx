@@ -58,6 +58,8 @@
 #include "mx/core/elements/Sign.h"
 #include "mx/core/elements/Sound.h"
 #include "mx/core/elements/Staff.h"
+#include "mx/core/elements/StaffDetails.h"
+#include "mx/core/elements/StaffLines.h"
 #include "mx/core/elements/Step.h"
 #include "mx/core/elements/Time.h"
 #include "mx/core/elements/TimeChoice.h"
@@ -532,6 +534,7 @@ namespace mx
                 
                 myOutMeasureData.keys.emplace_back( std::move( keyData ) );
             }
+            importStaffDetails( inMxProperties );
             importClefs( inMxProperties.getClefSet() );
 
             if( !inMxProperties.getTransposeSet().empty() )
@@ -668,6 +671,33 @@ namespace mx
         }
         
         
+        void MeasureReader::importStaffDetails( const core::Properties& inMxProperties ) const
+        {
+            for( const auto& staffDetailsPtr : inMxProperties.getStaffDetailsSet() )
+            {
+                if( !staffDetailsPtr || !staffDetailsPtr->getHasStaffLines() )
+                {
+                    continue;
+                }
+
+                const auto& attr = *staffDetailsPtr->getAttributes();
+                auto staffIndex = 0;
+                if( attr.hasNumber )
+                {
+                    staffIndex = attr.number.getValue() - 1;
+                }
+
+                if( staffIndex < 0 || staffIndex >= static_cast<int>( myOutMeasureData.staves.size() ) )
+                {
+                    continue;
+                }
+
+                myOutMeasureData.staves.at( static_cast<size_t>( staffIndex ) ).staffLines =
+                    staffDetailsPtr->getStaffLines()->getValue().getValue();
+            }
+        }
+
+
         void MeasureReader::importClefs( const core::ClefSet& inClefs ) const
         {
             auto iter = inClefs.cbegin();
