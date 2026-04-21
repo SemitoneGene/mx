@@ -2422,6 +2422,7 @@ namespace mx
         {
             if( value == "cue" ) { return NoteSizeType::cue; }
             else if( value == "grace" ) { return NoteSizeType::grace; }
+            else if( value == "grace-cue" ) { return NoteSizeType::graceCue; }
             else if( value == "large" ) { return NoteSizeType::large; }
             return std::optional<NoteSizeType>{};
         }
@@ -2432,6 +2433,7 @@ namespace mx
             {
                 case NoteSizeType::cue: { return "cue"; }
                 case NoteSizeType::grace: { return "grace"; }
+                case NoteSizeType::graceCue: { return "grace-cue"; }
                 case NoteSizeType::large: { return "large"; }
                 default: break;
             }

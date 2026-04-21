@@ -1163,15 +1163,17 @@ namespace mx
         /// NoteSizeType ///////////////////////////////////////////////////////////////////////////
         ///
         /// The note-size-type type indicates the type of note being defined by a note-size element.
-        /// The grace type is used for notes of cue size that that include a grace element. The cue
-        /// type is used for all other notes with cue size, whether defined explicitly or implicitly
-        /// via a cue element. The large type is used for notes of large size.
+        /// The grace type is used for notes of cue size that that include a grace element. The
+        /// grace-cue type is used for notes that include both a grace and cue element. The cue type
+        /// is used for all other notes with cue size, whether defined explicitly or implicitly via a
+        /// cue element. The large type is used for notes of large size.
         ///
         enum class NoteSizeType
         {
             cue = 0,
             grace = 1,
-            large = 2
+            graceCue = 2,
+            large = 3
         };
 
         NoteSizeType parseNoteSizeType( const std::string& value );

@@ -268,7 +268,7 @@ namespace mx
                 }
                 case core::DirectionType::Choice::dampAll:
                 {
-                    parseRehearsal( directionType );
+                    parseDampAll( directionType );
                     break;
                 }
                 case core::DirectionType::Choice::eyeglasses:
