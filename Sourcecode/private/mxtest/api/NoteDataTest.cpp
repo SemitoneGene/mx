@@ -88,6 +88,52 @@ TEST( otherArticulation, NoteData )
 
 T_END;
 
+TEST( pitchedRestDisplayStepOctave, NoteData )
+{
+    ScoreData score;
+    score.parts.emplace_back();
+    score.ticksPerQuarter = 96;
+    auto& part = score.parts.back();
+    part.measures.emplace_back();
+    auto& measure = part.measures.back();
+    measure.staves.emplace_back();
+    auto& staff = measure.staves.back();
+    auto& voice = staff.voices[0];
+
+    NoteData rest;
+    rest.isRest = true;
+    rest.isDisplayStepOctaveSpecified = true;
+    rest.pitchData.step = Step::e;
+    rest.pitchData.octave = 4;
+    rest.durationData.durationName = DurationName::quarter;
+    rest.durationData.durationTimeTicks = 96;
+    voice.notes.push_back( rest );
+
+    auto& mgr = DocumentManager::getInstance();
+    auto docId = mgr.createFromScore( score );
+    std::stringstream ss;
+    mgr.writeToStream( docId, ss );
+    mgr.destroyDocument( docId );
+    const auto xml = ss.str();
+    CHECK( xml.find( "<display-step>E</display-step>" ) != std::string::npos );
+    CHECK( xml.find( "<display-octave>4</display-octave>" ) != std::string::npos );
+
+    std::istringstream iss{ xml };
+    docId = mgr.createFromStream( iss );
+    const auto outScore = mgr.getData( docId );
+    mgr.destroyDocument( docId );
+
+    const auto& outRest = outScore.parts.back()
+                             .measures.back()
+                             .staves.back()
+                             .voices.begin()
+                             ->second.notes.back();
+    CHECK( outRest.isRest );
+    CHECK( outRest.isDisplayStepOctaveSpecified );
+    CHECK( outRest.pitchData.step == Step::e );
+    CHECK_EQUAL( 4, outRest.pitchData.octave );
+}
+
 TEST( customErrorUnknown, MarkData )
 {
     const auto expectedMark = mx::api::MarkType::customErrorUnknown;

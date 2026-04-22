@@ -343,7 +343,9 @@ namespace mx
                 myOutFullNoteTypeChoice->setChoice( core::FullNoteTypeChoice::Choice::rest );
                 if( myNoteData.isDisplayStepOctaveSpecified )
                 {
-                    auto pitch = myOutFullNoteTypeChoice->getUnpitched()->getDisplayStepOctaveGroup();
+                    auto rest = myOutFullNoteTypeChoice->getRest();
+                    rest->setHasDisplayStepOctaveGroup( true );
+                    auto pitch = rest->getDisplayStepOctaveGroup();
                     pitch->getDisplayStep()->setValue( myConverter.convert( myNoteData.pitchData.step ) );
                     pitch->getDisplayOctave()->setValue( core::OctaveValue{ myNoteData.pitchData.octave } );
                 }
@@ -360,7 +362,9 @@ namespace mx
                 myOutFullNoteTypeChoice->setChoice( core::FullNoteTypeChoice::Choice::unpitched );
                 if( myNoteData.isDisplayStepOctaveSpecified )
                 {
-                    auto pitch = myOutFullNoteTypeChoice->getUnpitched()->getDisplayStepOctaveGroup();
+                    auto unpitched = myOutFullNoteTypeChoice->getUnpitched();
+                    unpitched->setHasDisplayStepOctaveGroup( true );
+                    auto pitch = unpitched->getDisplayStepOctaveGroup();
                     pitch->getDisplayStep()->setValue( myConverter.convert( myNoteData.pitchData.step ) );
                     pitch->getDisplayOctave()->setValue( core::OctaveValue{ myNoteData.pitchData.octave } );
                 }
