@@ -94,7 +94,7 @@ namespace mx
             std::optional<api::TransposeData> parseProperties( const core::Properties& inMxProperties ) const;
             
             void parseHarmony( std::shared_ptr<const core::Harmony> inHarmony ) const;
-            void parseFiguredBass( const core::FiguredBass& inMxFiguredBass ) const;
+            void parseFiguredBass( const core::FiguredBass& inMxFiguredBass, const core::NotePtr& nextNotePtr ) const;
             void parsePrint( const core::Print& inMxPrint ) const;
             void parseSound( const core::Sound& inMxSound ) const;
             void parseBarline( const core::Barline& inMxBarline ) const;
