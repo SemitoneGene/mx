@@ -19,6 +19,50 @@ namespace mx
 {
     namespace api
     {
+        enum class DirectionComponentKind
+        {
+            tempo,
+            mark,
+            wedgeStart,
+            wedgeStop,
+            ottavaStart,
+            ottavaStop,
+            bracketStart,
+            bracketStop,
+            dashesStart,
+            dashesStop,
+            pedalStart,
+            pedalStop,
+            words,
+            chord,
+            segno,
+            coda,
+            rehearsal
+        };
+
+        struct DirectionComponent
+        {
+            DirectionComponentKind kind;
+            int index;
+
+            DirectionComponent()
+            : kind{ DirectionComponentKind::tempo }
+            , index{ 0 }
+            {
+            }
+
+            DirectionComponent( DirectionComponentKind inKind, int inIndex )
+            : kind{ inKind }
+            , index{ inIndex }
+            {
+            }
+        };
+
+        MXAPI_EQUALS_BEGIN( DirectionComponent )
+        MXAPI_EQUALS_MEMBER( kind )
+        MXAPI_EQUALS_MEMBER( index )
+        MXAPI_EQUALS_END;
+        MXAPI_NOT_EQUALS_AND_VECTORS( DirectionComponent );
 
         // MusicXML Documentation: A direction is a musical indication that is not attached to a specific
         // note. Two or more may be combined to indicate starts and stops of wedges, dashes, etc.
@@ -72,6 +116,7 @@ namespace mx
             std::vector<SegnoData> segnos;
             std::vector<CodaData> codas;
             std::vector<RehearsalData> rehearsals;
+            std::vector<DirectionComponent> orderedComponents;
             
             DirectionData()
             : tickTimePosition{ 0 }
@@ -114,7 +159,8 @@ namespace mx
             directionData.ottavaStops.size() == 0 &&
             directionData.words.size() == 0 &&
             directionData.segnos.size() == 0 &&
-            directionData.codas.size() == 0;
+            directionData.codas.size() == 0 &&
+            directionData.orderedComponents.size() == 0;
         }
         
         MXAPI_EQUALS_BEGIN( DirectionData )
@@ -138,6 +184,7 @@ namespace mx
         MXAPI_EQUALS_MEMBER( chords )
         MXAPI_EQUALS_MEMBER( segnos )
         MXAPI_EQUALS_MEMBER( codas )
+        MXAPI_EQUALS_MEMBER( orderedComponents )
         MXAPI_EQUALS_END;
         MXAPI_NOT_EQUALS_AND_VECTORS( DirectionData );
 	}

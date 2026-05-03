@@ -49,6 +49,7 @@ namespace mx
             void parseValues();
             void fixTimes();
             mx::api::DirectionData returnData();
+            void appendOrderedComponent( api::DirectionComponentKind kind, int index );
             void parseStaffIndex();
             void parseDirectionType( const core::DirectionType& directionType );
             void parseRehearsal( const core::DirectionType& directionType );

@@ -197,6 +197,12 @@ namespace mx
         }
 
 
+        void DirectionReader::appendOrderedComponent( api::DirectionComponentKind kind, int index )
+        {
+            myOutDirectionData.orderedComponents.emplace_back( kind, index );
+        }
+
+
         void DirectionReader::parseDirectionType( const core::DirectionType& directionType )
         {
             switch ( directionType.getChoice() )
@@ -358,6 +364,8 @@ namespace mx
                     }
                 }
                 myOutDirectionData.rehearsals.emplace_back( std::move( outRehearsal ) );
+                appendOrderedComponent( api::DirectionComponentKind::rehearsal,
+                                        static_cast<int>( myOutDirectionData.rehearsals.size() ) - 1 );
             }
 
             MX_UNUSED( directionType );
@@ -375,6 +383,8 @@ namespace mx
                 outSegno.positionData = getPositionData( attr );
                 outSegno.colorData = getColor( attr );
                 myOutDirectionData.segnos.emplace_back( std::move( outSegno ) );
+                appendOrderedComponent( api::DirectionComponentKind::segno,
+                                        static_cast<int>( myOutDirectionData.segnos.size() ) - 1 );
             }
         }
         
@@ -392,6 +402,8 @@ namespace mx
                 outWords.colorData = getColor( attr );
                 outWords.fontData = getFontData( attr );
                 myOutDirectionData.words.emplace_back( std::move( outWords ) );
+                appendOrderedComponent( api::DirectionComponentKind::words,
+                                        static_cast<int>( myOutDirectionData.words.size() ) - 1 );
             }
         }
         
@@ -407,6 +419,8 @@ namespace mx
                 outCoda.positionData = getPositionData( attr );
                 outCoda.colorData = getColor( attr );
                 myOutDirectionData.codas.emplace_back( std::move( outCoda ) );
+                appendOrderedComponent( api::DirectionComponentKind::coda,
+                                        static_cast<int>( myOutDirectionData.codas.size() ) - 1 );
             }
         }
         
@@ -436,6 +450,8 @@ namespace mx
                 }
                 stop.positionData = positionData;
                 myOutDirectionData.wedgeStops.emplace_back( std::move( stop ) );
+                appendOrderedComponent( api::DirectionComponentKind::wedgeStop,
+                                        static_cast<int>( myOutDirectionData.wedgeStops.size() ) - 1 );
                 return;
             }
             else
@@ -455,17 +471,24 @@ namespace mx
                 start.lineData = lineData;
                 start.colorData = colorData;
                 myOutDirectionData.wedgeStarts.emplace_back( std::move( start ) );
+                appendOrderedComponent( api::DirectionComponentKind::wedgeStart,
+                                        static_cast<int>( myOutDirectionData.wedgeStarts.size() ) - 1 );
             }
         }
         
         
         void DirectionReader::parseDynamics( const core::DirectionType& directionType )
         {
+            const auto markCountBefore = myOutDirectionData.marks.size();
             for( const auto& dynamic : directionType.getDynamicsSet() )
             {
                 DynamicsReader reader{ *dynamic, myCursor };
                 reader.parseDynamics( myOutDirectionData.marks );
                 //parseDynamic( *dynamic );
+            }
+            for( auto i = markCountBefore; i < myOutDirectionData.marks.size(); ++i )
+            {
+                appendOrderedComponent( api::DirectionComponentKind::mark, static_cast<int>( i ) );
             }
         }
         
@@ -487,6 +510,8 @@ namespace mx
             
             mark.name = valueObject.getValueString();            
             myOutDirectionData.marks.emplace_back( std::move( mark ) );
+            appendOrderedComponent( api::DirectionComponentKind::mark,
+                                    static_cast<int>( myOutDirectionData.marks.size() ) - 1 );
         }
         
         
@@ -500,6 +525,8 @@ namespace mx
                 auto stop = impl::getSpannerStop( attr );
                 stop.tickTimePosition = myCursor.tickTimePosition;
                 myOutDirectionData.dashesStops.emplace_back( std::move( stop ) );
+                appendOrderedComponent( api::DirectionComponentKind::dashesStop,
+                                        static_cast<int>( myOutDirectionData.dashesStops.size() ) - 1 );
                 return;
             }
             else if( attr.type == core::StartStopContinue::start )
@@ -511,6 +538,8 @@ namespace mx
                     start.lineData.lineType = api::LineType::dashed;
                 }
                 myOutDirectionData.dashesStarts.emplace_back( std::move( start ) );
+                appendOrderedComponent( api::DirectionComponentKind::dashesStart,
+                                        static_cast<int>( myOutDirectionData.dashesStarts.size() ) - 1 );
                 return;
             }
         }
@@ -553,6 +582,8 @@ namespace mx
                 stop.tickTimePosition = myCursor.tickTimePosition;
                 stop.lineData = makeBracketLineData();
                 myOutDirectionData.bracketStops.emplace_back( std::move( stop ) );
+                appendOrderedComponent( api::DirectionComponentKind::bracketStop,
+                                        static_cast<int>( myOutDirectionData.bracketStops.size() ) - 1 );
                 return;
             }
             else if( attr.type == core::StartStopContinue::start )
@@ -564,6 +595,8 @@ namespace mx
                 start.lineData = makeBracketLineData();
                 start.printData = impl::getPrintData( attr );
                 myOutDirectionData.bracketStarts.emplace_back( std::move( start ) );
+                appendOrderedComponent( api::DirectionComponentKind::bracketStart,
+                                        static_cast<int>( myOutDirectionData.bracketStarts.size() ) - 1 );
                 return;
             }
         }
@@ -600,6 +633,8 @@ namespace mx
                     start.lineData.lineType = api::LineType::solid;
                     start.lineData.lineHook = api::LineHook::none;
                     myOutDirectionData.pedalStarts.emplace_back( std::move( start ) );
+                    appendOrderedComponent( api::DirectionComponentKind::pedalStart,
+                                            static_cast<int>( myOutDirectionData.pedalStarts.size() ) - 1 );
                 }
                 else if( attr.type == core::StartStopChangeContinue::stop )
                 {
@@ -612,6 +647,8 @@ namespace mx
                     stop.lineData.isStopLengthSpecified = true;
                     stop.lineData.endLength = 10.0;
                     myOutDirectionData.pedalStops.emplace_back( std::move( stop ) );
+                    appendOrderedComponent( api::DirectionComponentKind::pedalStop,
+                                            static_cast<int>( myOutDirectionData.pedalStops.size() ) - 1 );
                 }
                 return;
             }
@@ -627,6 +664,8 @@ namespace mx
             mark.positionData = getPositionData( attr );
             mark.positionData.placement = placement;
             myOutDirectionData.marks.emplace_back( std::move( mark ) );
+            appendOrderedComponent( api::DirectionComponentKind::mark,
+                                    static_cast<int>( myOutDirectionData.marks.size() ) - 1 );
         }
 
         
@@ -635,6 +674,8 @@ namespace mx
             const auto& metronome = *directionType.getMetronome();
             MetronomeReader reader{ metronome };
             myOutDirectionData.tempos.emplace_back( reader.getTempoData() );
+            appendOrderedComponent( api::DirectionComponentKind::tempo,
+                                    static_cast<int>( myOutDirectionData.tempos.size() ) - 1 );
         }
         
         
@@ -655,6 +696,8 @@ namespace mx
                 auto stop = impl::getSpannerStop( attr );
                 stop.tickTimePosition = myCursor.tickTimePosition;
                 myOutDirectionData.ottavaStops.emplace_back( std::move( stop ) );
+                appendOrderedComponent( api::DirectionComponentKind::ottavaStop,
+                                        static_cast<int>( myOutDirectionData.ottavaStops.size() ) - 1 );
                 return;
             }
             
@@ -690,6 +733,8 @@ namespace mx
             start.ottavaType = ottavaType;
             start.spannerStart.tickTimePosition = myCursor.tickTimePosition;
             myOutDirectionData.ottavaStarts.emplace_back( std::move( start ) );
+            appendOrderedComponent( api::DirectionComponentKind::ottavaStart,
+                                    static_cast<int>( myOutDirectionData.ottavaStarts.size() ) - 1 );
         }
         
         
@@ -886,6 +931,8 @@ namespace mx
             chord.positionData = getPositionData( attr );
 
             myOutDirectionData.chords.push_back( chord );
+            appendOrderedComponent( api::DirectionComponentKind::chord,
+                                    static_cast<int>( myOutDirectionData.chords.size() ) - 1 );
         }
     }
 }
