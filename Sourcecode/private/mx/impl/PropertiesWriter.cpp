@@ -224,8 +224,14 @@ namespace mx
             myProperties->addTime( time );
             time->getTimeChoice()->setChoice( core::TimeChoice::Choice::timeSignature );
             auto sigGrp = time->getTimeChoice()->getTimeSignatureGroupSet().front();
-            sigGrp->getBeats()->setValue( core::XsString{ std::to_string( value.beats ) } );
-            sigGrp->getBeatType()->setValue( core::XsString{ std::to_string( value.beatType ) } );
+            const auto beatsString = value.beatsText.empty()
+                ? std::to_string( value.beats )
+                : value.beatsText;
+            const auto beatTypeString = value.beatTypeText.empty()
+                ? std::to_string( value.beatType )
+                : value.beatTypeText;
+            sigGrp->getBeats()->setValue( core::XsString{ beatsString } );
+            sigGrp->getBeatType()->setValue( core::XsString{ beatTypeString } );
             
             const auto symbol = value.symbol;
             if( symbol != api::TimeSignatureSymbol::unspecified )
@@ -238,6 +244,10 @@ namespace mx
                 else if( symbol == api::TimeSignatureSymbol::cut )
                 {
                     time->getAttributes()->symbol = core::TimeSymbol::cut;
+                }
+                else if( symbol == api::TimeSignatureSymbol::singleNumber )
+                {
+                    time->getAttributes()->symbol = core::TimeSymbol::singleNumber;
                 }
             }
             
