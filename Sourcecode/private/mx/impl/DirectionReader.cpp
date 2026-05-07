@@ -25,6 +25,10 @@
 #include "mx/core/elements/Eyeglasses.h"
 #include "mx/core/elements/Footnote.h"
 #include "mx/core/elements/Frame.h"
+#include "mx/core/elements/FrameFrets.h"
+#include "mx/core/elements/FrameNote.h"
+#include "mx/core/elements/FrameStrings.h"
+#include "mx/core/elements/FirstFret.h"
 #include "mx/core/elements/Function.h"
 #include "mx/core/elements/Harmony.h"
 #include "mx/core/elements/HarmonyChordGroup.h"
@@ -49,6 +53,10 @@
 #include "mx/core/elements/Sound.h"
 #include "mx/core/elements/Staff.h"
 #include "mx/core/elements/Staff.h"
+#include "mx/core/elements/Barre.h"
+#include "mx/core/elements/Fingering.h"
+#include "mx/core/elements/Fret.h"
+#include "mx/core/elements/String.h"
 #include "mx/core/elements/StringMute.h"
 #include "mx/core/elements/Voice.h"
 #include "mx/core/elements/Wedge.h"
@@ -925,6 +933,56 @@ namespace mx
                 misc.name = pi.getName();
                 misc.data = pi.getData();
                 chord.miscData.push_back( misc );
+            }
+
+            if( inHarmony.getHasFrame() )
+            {
+                chord.hasFrameData = true;
+                const auto frame = inHarmony.getFrame();
+                chord.frameData.stringCount = static_cast<int>( frame->getFrameStrings()->getValue().getValue() );
+                chord.frameData.fretCount = static_cast<int>( frame->getFrameFrets()->getValue().getValue() );
+
+                if( frame->getHasFirstFret() )
+                {
+                    chord.frameData.isFirstFretSpecified = true;
+                    chord.frameData.firstFret = static_cast<int>( frame->getFirstFret()->getValue().getValue() );
+                }
+
+                for( const auto& frameNotePtr : frame->getFrameNoteSet() )
+                {
+                    api::FrameNoteData frameNote;
+                    frameNote.stringNumber = static_cast<int>( frameNotePtr->getString()->getValue().getValue() );
+                    frameNote.fretNumber = static_cast<int>( frameNotePtr->getFret()->getValue().getValue() );
+
+                    if( frameNotePtr->getHasFingering() )
+                    {
+                        const auto fingeringText = frameNotePtr->getFingering()->getValue().getValue();
+                        try
+                        {
+                            frameNote.fingering = std::stoi( fingeringText );
+                            frameNote.isFingeringSpecified = true;
+                        }
+                        catch( ... )
+                        {
+                        }
+                    }
+
+                    if( frameNotePtr->getHasBarre() )
+                    {
+                        const auto barreType = frameNotePtr->getBarre()->getAttributes()->type;
+                        switch( barreType )
+                        {
+                            case core::StartStop::start:
+                                frameNote.barre = api::FrameBarre::start;
+                                break;
+                            case core::StartStop::stop:
+                                frameNote.barre = api::FrameBarre::stop;
+                                break;
+                        }
+                    }
+
+                    chord.frameData.notes.push_back( frameNote );
+                }
             }
 
             const auto& attr = *inHarmony.getAttributes();

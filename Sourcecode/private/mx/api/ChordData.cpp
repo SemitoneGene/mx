@@ -22,6 +22,27 @@ namespace mx
 
         }
 
+        FrameNoteData::FrameNoteData()
+        : stringNumber{ 1 }
+        , fretNumber{ 0 }
+        , fingering{ 0 }
+        , isFingeringSpecified{ false }
+        , barre{ FrameBarre::none }
+        {
+
+        }
+
+
+        FrameData::FrameData()
+        : stringCount{ 6 }
+        , fretCount{ 4 }
+        , firstFret{ 1 }
+        , isFirstFretSpecified{ false }
+        , notes{}
+        {
+
+        }
+
 
         ChordData::ChordData()
         : root{ Step::c }
@@ -33,6 +54,8 @@ namespace mx
         , bassAlter{ 0 }
         , extensions{}
         , miscData{}
+        , hasFrameData{ false }
+        , frameData{}
         , positionData{}
         {
 

@@ -31,6 +31,10 @@
 #include "mx/core/elements/Eyeglasses.h"
 #include "mx/core/elements/Footnote.h"
 #include "mx/core/elements/Frame.h"
+#include "mx/core/elements/FrameFrets.h"
+#include "mx/core/elements/FrameNote.h"
+#include "mx/core/elements/FrameStrings.h"
+#include "mx/core/elements/FirstFret.h"
 #include "mx/core/elements/Function.h"
 #include "mx/core/elements/Harmony.h"
 #include "mx/core/elements/HarmonyChordGroup.h"
@@ -57,6 +61,10 @@
 #include "mx/core/elements/Segno.h"
 #include "mx/core/elements/Sound.h"
 #include "mx/core/elements/Staff.h"
+#include "mx/core/elements/Barre.h"
+#include "mx/core/elements/Fingering.h"
+#include "mx/core/elements/Fret.h"
+#include "mx/core/elements/String.h"
 #include "mx/core/elements/StringMute.h"
 #include "mx/core/elements/Voice.h"
 #include "mx/core/elements/Wedge.h"
@@ -600,6 +608,49 @@ namespace mx
                 const auto miscEnd = chordIter->miscData.cend();
                 for( ; miscIter != miscEnd; ++miscIter ) {
                     harmony->addProcessingInstruction(core::ProcessingInstruction{miscIter->name, miscIter->data});
+                }
+
+                if( chordIter->hasFrameData )
+                {
+                    harmony->setHasFrame( true );
+                    auto frame = harmony->getFrame();
+                    frame->getFrameStrings()->setValue( core::PositiveInteger{ chordIter->frameData.stringCount } );
+                    frame->getFrameFrets()->setValue( core::PositiveInteger{ chordIter->frameData.fretCount } );
+
+                    if( chordIter->frameData.isFirstFretSpecified )
+                    {
+                        frame->setHasFirstFret( true );
+                        frame->getFirstFret()->setValue( core::PositiveInteger{ chordIter->frameData.firstFret } );
+                    }
+                    else
+                    {
+                        frame->setHasFirstFret( false );
+                    }
+
+                    frame->clearFrameNoteSet();
+                    for( const auto& noteData : chordIter->frameData.notes )
+                    {
+                        auto frameNote = core::makeFrameNote();
+                        frameNote->getString()->setValue( core::StringNumber{ noteData.stringNumber } );
+                        frameNote->getFret()->setValue( core::NonNegativeInteger{ noteData.fretNumber } );
+
+                        if( noteData.isFingeringSpecified )
+                        {
+                            frameNote->setHasFingering( true );
+                            frameNote->getFingering()->setValue( core::XsString{ std::to_string( noteData.fingering ) } );
+                        }
+
+                        if( noteData.barre != api::FrameBarre::none )
+                        {
+                            frameNote->setHasBarre( true );
+                            frameNote->getBarre()->getAttributes()->type =
+                                noteData.barre == api::FrameBarre::start
+                                    ? core::StartStop::start
+                                    : core::StartStop::stop;
+                        }
+
+                        frame->addFrameNote( frameNote );
+                    }
                 }
 
                 if( output.empty() )
