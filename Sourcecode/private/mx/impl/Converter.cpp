@@ -326,10 +326,10 @@ namespace mx
             // std::pair<core::TechnicalChoice::Choice, api::MarkType>{ core::TechnicalChoice::Choice::tap, api::MarkType::unspecified },
             std::pair<core::TechnicalChoice::Choice, api::MarkType>{ core::TechnicalChoice::Choice::heel, api::MarkType::heel },
             std::pair<core::TechnicalChoice::Choice, api::MarkType>{ core::TechnicalChoice::Choice::toe, api::MarkType::toe },
-            std::pair<core::TechnicalChoice::Choice, api::MarkType>{ core::TechnicalChoice::Choice::fingernails, api::MarkType::unspecified },
-            // std::pair<core::TechnicalChoice::Choice, api::MarkType>{ core::TechnicalChoice::Choice::hole, api::MarkType::unspecified },
-            // std::pair<core::TechnicalChoice::Choice, api::MarkType>{ core::TechnicalChoice::Choice::arrow, api::MarkType::unspecified },
-            // std::pair<core::TechnicalChoice::Choice, api::MarkType>{ core::TechnicalChoice::Choice::handbell, api::MarkType::unspecified },
+            std::pair<core::TechnicalChoice::Choice, api::MarkType>{ core::TechnicalChoice::Choice::fingernails, api::MarkType::fingernails },
+            std::pair<core::TechnicalChoice::Choice, api::MarkType>{ core::TechnicalChoice::Choice::hole, api::MarkType::hole },
+            std::pair<core::TechnicalChoice::Choice, api::MarkType>{ core::TechnicalChoice::Choice::arrow, api::MarkType::arrow },
+            std::pair<core::TechnicalChoice::Choice, api::MarkType>{ core::TechnicalChoice::Choice::handbell, api::MarkType::handbell },
             std::pair<core::TechnicalChoice::Choice, api::MarkType>{ core::TechnicalChoice::Choice::otherTechnical, api::MarkType::otherTechnical },
         };
         

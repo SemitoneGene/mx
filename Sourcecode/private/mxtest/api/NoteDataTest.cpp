@@ -8,6 +8,7 @@
 
     #include "cpul/cpulTestHarness.h"
     #include "mxtest/api/RoundTrip.h"
+    #include "mxtest/file/Path.h"
     #include "mx/api/DocumentManager.h"
     #include "mx/core/Document.h"
     #include "mx/core/elements/ScorePartwise.h"
@@ -304,6 +305,35 @@ TEST( technical, NoteData )
     CHECK( md.positionData.isDefaultYSpecified );
     CHECK_DOUBLES_EQUAL( -456.0, md.positionData.defaultY, 0.00001 );
     CHECK_EQUAL( "Bob", md.name );
+}
+
+T_END;
+
+TEST( technical_import_file, NoteData )
+{
+    auto& mgr = DocumentManager::getInstance();
+    const auto path = std::string{ mxtest::getResourcesDirectoryPath() } + std::string{ "/ksuite/k004a_Technical.xml" };
+    const auto docId = mgr.createFromFile( path );
+    const auto score = mgr.getData( docId );
+    mgr.destroyDocument( docId );
+
+    const auto& part = score.parts.at( 0 );
+
+    const auto& fingernailsMark = part.measures.at( 19 ).staves.at( 0 ).voices.at( 0 ).notes.at( 0 ).noteAttachmentData.marks.at( 0 );
+    CHECK( fingernailsMark.markType == MarkType::fingernails );
+    CHECK_EQUAL( "fingernails", fingernailsMark.name );
+
+    const auto& holeMark = part.measures.at( 20 ).staves.at( 0 ).voices.at( 0 ).notes.at( 0 ).noteAttachmentData.marks.at( 0 );
+    CHECK( holeMark.markType == MarkType::hole );
+    CHECK_EQUAL( "windOpenHole", holeMark.name );
+
+    const auto& arrowMark = part.measures.at( 21 ).staves.at( 0 ).voices.at( 0 ).notes.at( 0 ).noteAttachmentData.marks.at( 0 );
+    CHECK( arrowMark.markType == MarkType::arrow );
+    CHECK_EQUAL( "arrowOpenUp", arrowMark.name );
+
+    const auto& handbellMark = part.measures.at( 22 ).staves.at( 0 ).voices.at( 0 ).notes.at( 0 ).noteAttachmentData.marks.at( 0 );
+    CHECK( handbellMark.markType == MarkType::handbell );
+    CHECK_EQUAL( "handbellsDamp3", handbellMark.name );
 }
 
 T_END;

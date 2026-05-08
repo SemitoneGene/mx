@@ -140,9 +140,9 @@ namespace mx
             heel,
             toe,
             fingernails,
-            // hole,
-            // arrow,
-            // handbell,
+            hole,
+            arrow,
+            handbell,
             otherTechnical,
             unknownTechnical,
             

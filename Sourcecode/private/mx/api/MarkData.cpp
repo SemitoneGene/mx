@@ -136,6 +136,9 @@ namespace mx
             ( markType == MarkType::heel ) ||
             ( markType == MarkType::toe ) ||
             ( markType == MarkType::fingernails ) ||
+            ( markType == MarkType::hole ) ||
+            ( markType == MarkType::arrow ) ||
+            ( markType == MarkType::handbell ) ||
             ( markType == MarkType::otherTechnical );
         }
 
