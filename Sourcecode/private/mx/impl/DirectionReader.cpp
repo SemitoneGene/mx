@@ -409,6 +409,36 @@ namespace mx
                 outWords.positionData = getPositionData( attr );
                 outWords.colorData = getColor( attr );
                 outWords.fontData = getFontData( attr );
+                if( attr.hasEnclosure )
+                {
+                    switch( attr.enclosure )
+                    {
+                        case core::EnclosureShape::rectangle:
+                            outWords.enclosure = api::RehearsalEnclosure::rectangle;
+                            break;
+                        case core::EnclosureShape::square:
+                            outWords.enclosure = api::RehearsalEnclosure::square;
+                            break;
+                        case core::EnclosureShape::oval:
+                            outWords.enclosure = api::RehearsalEnclosure::oval;
+                            break;
+                        case core::EnclosureShape::circle:
+                            outWords.enclosure = api::RehearsalEnclosure::circle;
+                            break;
+                        case core::EnclosureShape::bracket:
+                            outWords.enclosure = api::RehearsalEnclosure::bracket;
+                            break;
+                        case core::EnclosureShape::triangle:
+                            outWords.enclosure = api::RehearsalEnclosure::triangle;
+                            break;
+                        case core::EnclosureShape::diamond:
+                            outWords.enclosure = api::RehearsalEnclosure::diamond;
+                            break;
+                        case core::EnclosureShape::none:
+                            outWords.enclosure = api::RehearsalEnclosure::none;
+                            break;
+                    }
+                }
                 myOutDirectionData.words.emplace_back( std::move( outWords ) );
                 appendOrderedComponent( api::DirectionComponentKind::words,
                                         static_cast<int>( myOutDirectionData.words.size() ) - 1 );

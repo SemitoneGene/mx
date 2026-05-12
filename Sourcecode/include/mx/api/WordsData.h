@@ -8,6 +8,7 @@
 #include "mx/api/PositionData.h"
 #include "mx/api/ColorData.h"
 #include "mx/api/FontData.h"
+#include "mx/api/RehearsalData.h"
 
 namespace mx
 {
@@ -21,6 +22,7 @@ namespace mx
             FontData fontData;
             bool isColorSpecified;
             ColorData colorData;
+            RehearsalEnclosure enclosure;
 
             WordsData()
             : text{}
@@ -28,6 +30,7 @@ namespace mx
             , fontData{}
             , isColorSpecified{ false }
             , colorData{}
+            , enclosure{ RehearsalEnclosure::none }
             {
 
             }
@@ -38,6 +41,7 @@ namespace mx
         MXAPI_EQUALS_MEMBER( fontData )
         MXAPI_EQUALS_MEMBER( isColorSpecified )
         MXAPI_EQUALS_MEMBER( colorData )
+        MXAPI_EQUALS_MEMBER( enclosure )
         MXAPI_EQUALS_END;
         MXAPI_NOT_EQUALS_AND_VECTORS( WordsData );
     }
