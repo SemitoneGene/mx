@@ -3,60 +3,80 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+SCRIPT_NAME="$(basename "$0")"
 
-VENDORED_XCFRAMEWORK="$REPO_ROOT/../komp/Frameworks/FrameworksApple/Mx.xcframework"
-OUTPUT_XCFRAMEWORK="/tmp/MxRebuilt.xcframework"
-CONFIGURATION="Debug"
+MX_PROJECT="$REPO_ROOT/Xcode/Mx.xcodeproj"
+OUTPUT_XCFRAMEWORK="/tmp/Mx.xcframework"
+INSTALL_PATH="$REPO_ROOT/../komp/Frameworks/FrameworksApple/Mx.xcframework"
+CONFIGURATION="Release"
+DERIVED_DATA=""
 INSTALL_OUTPUT=0
-KEEP_TEMP=0
+INSTALL_ONLY=0
+KEEP_ARCHIVES=0
 
 usage() {
-    cat <<USAGE
-Usage: $(basename "$0") [options]
+    cat <<EOF
+Usage: $SCRIPT_NAME [options]
 
-Rebuilds the macOS slice of Mx.xcframework from this mx repo, recreates a full
-xcframework using the existing iOS slices, and optionally installs it over the
-vendored copy used by Notation.
+Build a fresh Mx.xcframework from this mx Xcode project using xcodebuild
+archive and xcodebuild -create-xcframework.
 
 Options:
-  --vendored-xcframework PATH
-                            Path to the existing vendored Mx.xcframework.
-                            Default: $VENDORED_XCFRAMEWORK
-  --output PATH             Path for the rebuilt xcframework.
-                            Default: $OUTPUT_XCFRAMEWORK
-  --configuration NAME      Xcode build configuration.
-                            Default: $CONFIGURATION
-  --install                 Replace the vendored xcframework with the rebuilt one.
-  --keep-temp               Keep the temporary working directory.
-  --help                    Show this message.
+  --project PATH          Path to Mx.xcodeproj.
+                          Default: $MX_PROJECT
+  --output PATH           Output path for the generated xcframework.
+                          Default: $OUTPUT_XCFRAMEWORK
+  --install-path PATH     Path to install the xcframework when using --install.
+                          Default: $INSTALL_PATH
+  --configuration NAME    Xcode build configuration.
+                          Default: $CONFIGURATION
+  --derived-data PATH     Reuse a specific DerivedData directory.
+  --install               Copy the built xcframework into --install-path after building.
+  --install-only          Copy an existing xcframework at --output into --install-path
+                          without rebuilding.
+  --keep-archives         Keep the temporary archives directory.
+  --help                  Show this message.
 
 Examples:
-  $(basename "$0")
-  $(basename "$0") --output /tmp/Mx.xcframework
-  $(basename "$0") --install
-USAGE
+  $SCRIPT_NAME
+  $SCRIPT_NAME --configuration Debug --output /tmp/MxDebug.xcframework
+  $SCRIPT_NAME --install
+  $SCRIPT_NAME --output /tmp/Mx.xcframework --install-only
+EOF
 }
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --vendored-xcframework)
-            VENDORED_XCFRAMEWORK="$2"
+        --project)
+            MX_PROJECT="$2"
             shift 2
             ;;
         --output)
             OUTPUT_XCFRAMEWORK="$2"
             shift 2
             ;;
+        --install-path)
+            INSTALL_PATH="$2"
+            shift 2
+            ;;
         --configuration)
             CONFIGURATION="$2"
+            shift 2
+            ;;
+        --derived-data)
+            DERIVED_DATA="$2"
             shift 2
             ;;
         --install)
             INSTALL_OUTPUT=1
             shift
             ;;
-        --keep-temp)
-            KEEP_TEMP=1
+        --install-only)
+            INSTALL_ONLY=1
+            shift
+            ;;
+        --keep-archives)
+            KEEP_ARCHIVES=1
             shift
             ;;
         --help)
@@ -71,6 +91,14 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+require_tool() {
+    local tool="$1"
+    if ! command -v "$tool" >/dev/null 2>&1; then
+        echo "Required tool not found: $tool" >&2
+        exit 1
+    fi
+}
+
 require_path() {
     local path="$1"
     local label="$2"
@@ -80,67 +108,97 @@ require_path() {
     fi
 }
 
-require_path "$REPO_ROOT/Xcode/Mx.xcodeproj" "mx project"
-require_path "$VENDORED_XCFRAMEWORK/ios-arm64/MxiOS.framework" "iOS arm64 slice"
-require_path "$VENDORED_XCFRAMEWORK/ios-arm64_x86_64-simulator/MxiOS.framework" "iOS simulator slice"
-require_path "$VENDORED_XCFRAMEWORK/ios-arm64_x86_64-maccatalyst/MxiOS.framework" "Mac Catalyst slice"
-
-TEMP_DIR="$(mktemp -d /tmp/mx-xcframework.XXXXXX)"
-trap 'if [[ "$KEEP_TEMP" -eq 0 ]]; then rm -rf "$TEMP_DIR"; else echo "Keeping temp dir: $TEMP_DIR"; fi' EXIT
-
-DERIVED_ARM64="$TEMP_DIR/MxDerived-arm64"
-DERIVED_X86_64="$TEMP_DIR/MxDerived-x86_64"
-UNIVERSAL_FRAMEWORK="$TEMP_DIR/MxmacOS.framework"
-ARM64_FRAMEWORK="$DERIVED_ARM64/Build/Products/$CONFIGURATION/MxmacOS.framework"
-X86_64_FRAMEWORK="$DERIVED_X86_64/Build/Products/$CONFIGURATION/MxmacOS.framework"
-UNIVERSAL_BINARY="$UNIVERSAL_FRAMEWORK/Versions/A/MxmacOS"
-
-build_framework() {
-    local arch="$1"
-    local derived_data="$2"
-    echo "Building MxmacOS.framework for $arch..."
-    xcodebuild \
-        -project "$REPO_ROOT/Xcode/Mx.xcodeproj" \
-        -scheme MxmacOS \
-        -configuration "$CONFIGURATION" \
-        -derivedDataPath "$derived_data" \
-        build \
-        CODE_SIGNING_ALLOWED=NO \
-        ARCHS="$arch" \
-        ONLY_ACTIVE_ARCH=NO
+install_xcframework() {
+    local source_path="$1"
+    echo "Installing xcframework into $INSTALL_PATH"
+    rm -rf "$INSTALL_PATH"
+    mkdir -p "$(dirname "$INSTALL_PATH")"
+    rsync -a "$source_path/" "$INSTALL_PATH/"
 }
 
-build_framework arm64 "$DERIVED_ARM64"
-build_framework x86_64 "$DERIVED_X86_64"
+require_tool xcodebuild
+require_tool rsync
 
-require_path "$ARM64_FRAMEWORK/Versions/A/MxmacOS" "arm64 framework binary"
-require_path "$X86_64_FRAMEWORK/Versions/A/MxmacOS" "x86_64 framework binary"
+if [[ "$INSTALL_ONLY" -eq 1 ]]; then
+    if [[ "$INSTALL_OUTPUT" -eq 1 ]]; then
+        echo "Use either --install or --install-only, not both." >&2
+        exit 1
+    fi
+    require_path "$OUTPUT_XCFRAMEWORK" "xcframework output"
+    install_xcframework "$OUTPUT_XCFRAMEWORK"
+    echo "Done"
+    echo "Installed from: $OUTPUT_XCFRAMEWORK"
+    echo "Installed to: $INSTALL_PATH"
+    exit 0
+fi
 
-echo "Creating universal MxmacOS.framework..."
-rm -rf "$UNIVERSAL_FRAMEWORK"
-rsync -a "$ARM64_FRAMEWORK/" "$UNIVERSAL_FRAMEWORK/"
-lipo -create \
-    "$ARM64_FRAMEWORK/Versions/A/MxmacOS" \
-    "$X86_64_FRAMEWORK/Versions/A/MxmacOS" \
-    -output "$UNIVERSAL_BINARY"
-lipo -info "$UNIVERSAL_BINARY"
+require_path "$MX_PROJECT" "mx project"
 
-echo "Recreating xcframework at $OUTPUT_XCFRAMEWORK..."
+if [[ -z "$DERIVED_DATA" ]]; then
+    DERIVED_DATA="$(mktemp -d /tmp/mx-derived-data.XXXXXX)"
+    CREATED_DERIVED_DATA=1
+else
+    mkdir -p "$DERIVED_DATA"
+    CREATED_DERIVED_DATA=0
+fi
+
+ARCHIVE_ROOT="$(mktemp -d /tmp/mx-archives.XXXXXX)"
+
+cleanup() {
+    if [[ "$CREATED_DERIVED_DATA" -eq 1 ]]; then
+        rm -rf "$DERIVED_DATA"
+    fi
+    if [[ "$KEEP_ARCHIVES" -eq 0 ]]; then
+        rm -rf "$ARCHIVE_ROOT"
+    else
+        echo "Keeping archives in $ARCHIVE_ROOT"
+    fi
+}
+trap cleanup EXIT
+
+archive_framework() {
+    local scheme="$1"
+    local destination="$2"
+    local archive_path="$3"
+
+    echo "Archiving $scheme for $destination"
+    xcodebuild archive \
+        -project "$MX_PROJECT" \
+        -scheme "$scheme" \
+        -configuration "$CONFIGURATION" \
+        -destination "$destination" \
+        -archivePath "$archive_path" \
+        -derivedDataPath "$DERIVED_DATA" \
+        SKIP_INSTALL=NO \
+        BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+        CODE_SIGNING_ALLOWED=NO
+}
+
+MACOS_ARCHIVE="$ARCHIVE_ROOT/Mx-macOS.xcarchive"
+IOS_ARCHIVE="$ARCHIVE_ROOT/Mx-iOS.xcarchive"
+IOS_SIM_ARCHIVE="$ARCHIVE_ROOT/Mx-iOS-Simulator.xcarchive"
+CATALYST_ARCHIVE="$ARCHIVE_ROOT/Mx-Catalyst.xcarchive"
+
+archive_framework "MxmacOS" "generic/platform=macOS" "$MACOS_ARCHIVE"
+archive_framework "MxiOS" "generic/platform=iOS" "$IOS_ARCHIVE"
+archive_framework "MxiOS" "generic/platform=iOS Simulator" "$IOS_SIM_ARCHIVE"
+archive_framework "MxiOS" "generic/platform=macOS,variant=Mac Catalyst" "$CATALYST_ARCHIVE"
+
+echo "Creating xcframework at $OUTPUT_XCFRAMEWORK"
 rm -rf "$OUTPUT_XCFRAMEWORK"
 xcodebuild -create-xcframework \
-    -framework "$VENDORED_XCFRAMEWORK/ios-arm64/MxiOS.framework" \
-    -framework "$VENDORED_XCFRAMEWORK/ios-arm64_x86_64-simulator/MxiOS.framework" \
-    -framework "$VENDORED_XCFRAMEWORK/ios-arm64_x86_64-maccatalyst/MxiOS.framework" \
-    -framework "$UNIVERSAL_FRAMEWORK" \
+    -archive "$MACOS_ARCHIVE" -framework MxmacOS.framework \
+    -archive "$IOS_ARCHIVE" -framework MxiOS.framework \
+    -archive "$IOS_SIM_ARCHIVE" -framework MxiOS.framework \
+    -archive "$CATALYST_ARCHIVE" -framework MxiOS.framework \
     -output "$OUTPUT_XCFRAMEWORK"
 
 if [[ "$INSTALL_OUTPUT" -eq 1 ]]; then
-    echo "Installing rebuilt xcframework into $VENDORED_XCFRAMEWORK..."
-    rsync -a --delete "$OUTPUT_XCFRAMEWORK/" "$VENDORED_XCFRAMEWORK/"
+    install_xcframework "$OUTPUT_XCFRAMEWORK"
 fi
 
-echo "Done."
-echo "Rebuilt xcframework: $OUTPUT_XCFRAMEWORK"
-if [[ "$INSTALL_OUTPUT" -eq 0 ]]; then
-    echo "Use --install to replace the vendored xcframework automatically."
+echo "Done"
+echo "XCFramework: $OUTPUT_XCFRAMEWORK"
+if [[ "$INSTALL_OUTPUT" -eq 1 ]]; then
+    echo "Installed to: $INSTALL_PATH"
 fi
