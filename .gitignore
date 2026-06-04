@@ -1,7 +1,8 @@
 build/
 cmake-build-*
-Sourcecode/private/mxtest/file/PathRoot.h
+src/private/mxtest/file/PathRoot.h
 **/Mx.xcframework
 **/xcuserdata/
 **/xcshareddata/
 *.DS_Store
+compile_commands.json

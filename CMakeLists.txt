@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.7.2)
+cmake_minimum_required(VERSION 3.13)
 project(mx)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CPP_VERSION 17)
 
 option(MX_BUILD_TESTS "build or skip the test suite" OFF)
@@ -16,7 +17,7 @@ option(
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
-set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/Sourcecode")
+set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(PRIVATE_DIR "${SOURCE_ROOT}/private")
 set(PUBLIC_DIR "${SOURCE_ROOT}/include")
 
@@ -45,6 +46,12 @@ source_group( "impl" FILES ${SRC_MX_IMPL} )
 source_group( "utility" FILES ${SRC_MX_UTILITY} )
 source_group( "ezxml" FILES ${SRC_MX_EZXML} )
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD ${CPP_VERSION})
+
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${PRIVATE_DIR})
 
